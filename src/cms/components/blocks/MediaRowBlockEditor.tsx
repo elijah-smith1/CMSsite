@@ -23,11 +23,17 @@ export const MediaRowBlockEditor: React.FC<MediaRowBlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<MediaRowBlock>(block);
+  const [data, setData] = useState<MediaRowBlock>({
+    ...block,
+    images: block.images ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      images: block.images ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -47,17 +53,17 @@ export const MediaRowBlockEditor: React.FC<MediaRowBlockEditorProps> = ({
       src: '',
       alt: '',
     };
-    updateField('images', [...data.images, newImage]);
+    updateField('images', [...(data.images ?? []), newImage]);
   };
 
   const updateImage = (index: number, updates: Partial<MediaImage>) => {
-    const images = [...data.images];
+    const images = [...(data.images ?? [])];
     images[index] = { ...images[index], ...updates };
     updateField('images', images);
   };
 
   const removeImage = (index: number) => {
-    const images = data.images.filter((_, i) => i !== index);
+    const images = (data.images ?? []).filter((_, i) => i !== index);
     updateField('images', images);
   };
 
@@ -88,7 +94,7 @@ export const MediaRowBlockEditor: React.FC<MediaRowBlockEditorProps> = ({
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-slate-700">
-            Images ({data.images.length})
+            Images ({(data.images ?? []).length})
           </label>
           <button
             type="button"

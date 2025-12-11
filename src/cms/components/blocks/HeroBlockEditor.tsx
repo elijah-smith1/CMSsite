@@ -24,11 +24,17 @@ export const HeroBlockEditor: React.FC<HeroBlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<HeroBlock>(block);
+  const [data, setData] = useState<HeroBlock>({
+    ...block,
+    ctas: block.ctas ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      ctas: block.ctas ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -49,17 +55,17 @@ export const HeroBlockEditor: React.FC<HeroBlockEditorProps> = ({
       url: '#',
       variant: 'primary',
     };
-    updateField('ctas', [...(data.ctas || []), newCTA]);
+    updateField('ctas', [...(data.ctas ?? []), newCTA]);
   };
 
   const updateCTA = (index: number, cta: CTA) => {
-    const ctas = [...(data.ctas || [])];
+    const ctas = [...(data.ctas ?? [])];
     ctas[index] = cta;
     updateField('ctas', ctas);
   };
 
   const removeCTA = (index: number) => {
-    const ctas = (data.ctas || []).filter((_, i) => i !== index);
+    const ctas = (data.ctas ?? []).filter((_, i) => i !== index);
     updateField('ctas', ctas);
   };
 

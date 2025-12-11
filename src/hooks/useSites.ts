@@ -15,6 +15,9 @@ import {
   updateNavigation,
   getFooter,
   updateFooter,
+  getPageIndex,
+  savePageById,
+  PageIndex,
 } from '../services/siteService';
 import { Site, Page, Block, Navigation, Footer } from '../utils/types/sites';
 import toast from 'react-hot-toast';
@@ -262,6 +265,63 @@ export const useUpdateFooter = (siteId: string) => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to update footer');
+    },
+  });
+};
+
+// ============================================
+// PAGE INDEX - Canonical page registry hooks
+// ============================================
+
+/**
+ * Hook to fetch page index.
+ * This is the AUTHORITATIVE source for page listing in the CMS.
+ * Falls back to generating from existing pages if pageIndex doesn't exist.
+ */
+export const usePageIndex = (siteId: string | undefined) => {
+  return useQuery({
+    queryKey: ['page-index', siteId],
+    queryFn: () => {
+      if (!siteId) throw new Error('Site ID required');
+      return getPageIndex(siteId);
+    },
+    enabled: !!siteId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
+
+/**
+ * Hook to save a page by its Firestore document ID.
+ * This is the DETERMINISTIC save function.
+ */
+export const useSavePage = (siteId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      title,
+      blocks,
+    }: {
+      pageId: string;
+      title: string;
+      blocks: Block[];
+    }) => {
+      // Validate pageId before save
+      if (!pageId) {
+        throw new Error('Page ID is required for save');
+      }
+      return savePageById(siteId, pageId, { title, blocks });
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate specific page and page list
+      queryClient.invalidateQueries({ queryKey: ['page', siteId, variables.pageId] });
+      queryClient.invalidateQueries({ queryKey: ['site-pages', siteId] });
+      queryClient.invalidateQueries({ queryKey: ['page-index', siteId] });
+      toast.success('Page saved');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to save page');
     },
   });
 };

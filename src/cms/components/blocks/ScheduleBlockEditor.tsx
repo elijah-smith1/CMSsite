@@ -22,12 +22,20 @@ export const ScheduleBlockEditor: React.FC<ScheduleBlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<ScheduleBlock>(block);
+  const [data, setData] = useState<ScheduleBlock>({
+    ...block,
+    filters: block.filters ?? [],
+    sessions: block.sessions ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
   const [newFilter, setNewFilter] = useState('');
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      filters: block.filters ?? [],
+      sessions: block.sessions ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -42,14 +50,14 @@ export const ScheduleBlockEditor: React.FC<ScheduleBlockEditorProps> = ({
   };
 
   const addFilter = () => {
-    if (newFilter.trim() && !data.filters?.includes(newFilter.trim())) {
-      updateField('filters', [...(data.filters || []), newFilter.trim()]);
+    if (newFilter.trim() && !(data.filters ?? []).includes(newFilter.trim())) {
+      updateField('filters', [...(data.filters ?? []), newFilter.trim()]);
       setNewFilter('');
     }
   };
 
   const removeFilter = (filter: string) => {
-    updateField('filters', (data.filters || []).filter((f) => f !== filter));
+    updateField('filters', (data.filters ?? []).filter((f) => f !== filter));
   };
 
   const addSession = () => {
@@ -58,17 +66,17 @@ export const ScheduleBlockEditor: React.FC<ScheduleBlockEditorProps> = ({
       name: 'New Session',
       time: '9:00 AM',
     };
-    updateField('sessions', [...data.sessions, newSession]);
+    updateField('sessions', [...(data.sessions ?? []), newSession]);
   };
 
   const updateSession = (index: number, updates: Partial<Session>) => {
-    const sessions = [...data.sessions];
+    const sessions = [...(data.sessions ?? [])];
     sessions[index] = { ...sessions[index], ...updates };
     updateField('sessions', sessions);
   };
 
   const removeSession = (index: number) => {
-    const sessions = data.sessions.filter((_, i) => i !== index);
+    const sessions = (data.sessions ?? []).filter((_, i) => i !== index);
     updateField('sessions', sessions);
   };
 

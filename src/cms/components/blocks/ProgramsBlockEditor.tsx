@@ -25,12 +25,18 @@ export const ProgramsBlockEditor: React.FC<ProgramsBlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<ProgramsBlock>(block);
+  const [data, setData] = useState<ProgramsBlock>({
+    ...block,
+    programs: block.programs ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
   const [expandedPrograms, setExpandedPrograms] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      programs: block.programs ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -60,19 +66,19 @@ export const ProgramsBlockEditor: React.FC<ProgramsBlockEditorProps> = ({
       name: 'New Program',
       description: 'Program description',
     };
-    updateField('programs', [...data.programs, newProgram]);
+    updateField('programs', [...(data.programs ?? []), newProgram]);
     setExpandedPrograms(new Set([...expandedPrograms, newProgram.id]));
   };
 
   const updateProgram = (index: number, updates: Partial<Program>) => {
-    const programs = [...data.programs];
+    const programs = [...(data.programs ?? [])];
     programs[index] = { ...programs[index], ...updates };
     updateField('programs', programs);
   };
 
   const removeProgram = (index: number) => {
     if (!confirm('Remove this program?')) return;
-    const programs = data.programs.filter((_, i) => i !== index);
+    const programs = (data.programs ?? []).filter((_, i) => i !== index);
     updateField('programs', programs);
   };
 

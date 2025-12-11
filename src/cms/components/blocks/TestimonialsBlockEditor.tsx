@@ -23,11 +23,17 @@ export const TestimonialsBlockEditor: React.FC<TestimonialsBlockEditorProps> = (
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<TestimonialsBlock>(block);
+  const [data, setData] = useState<TestimonialsBlock>({
+    ...block,
+    testimonials: block.testimonials ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      testimonials: block.testimonials ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -47,17 +53,17 @@ export const TestimonialsBlockEditor: React.FC<TestimonialsBlockEditorProps> = (
       quote: 'Add testimonial quote here',
       author: 'Customer Name',
     };
-    updateField('testimonials', [...data.testimonials, newTestimonial]);
+    updateField('testimonials', [...(data.testimonials ?? []), newTestimonial]);
   };
 
   const updateTestimonial = (index: number, updates: Partial<Testimonial>) => {
-    const testimonials = [...data.testimonials];
+    const testimonials = [...(data.testimonials ?? [])];
     testimonials[index] = { ...testimonials[index], ...updates };
     updateField('testimonials', testimonials);
   };
 
   const removeTestimonial = (index: number) => {
-    const testimonials = data.testimonials.filter((_, i) => i !== index);
+    const testimonials = (data.testimonials ?? []).filter((_, i) => i !== index);
     updateField('testimonials', testimonials);
   };
 

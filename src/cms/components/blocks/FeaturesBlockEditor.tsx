@@ -22,11 +22,17 @@ export const FeaturesBlockEditor: React.FC<FeaturesBlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<FeaturesBlock>(block);
+  const [data, setData] = useState<FeaturesBlock>({
+    ...block,
+    features: block.features ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      features: block.features ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -46,17 +52,17 @@ export const FeaturesBlockEditor: React.FC<FeaturesBlockEditorProps> = ({
       title: 'New Feature',
       description: 'Feature description',
     };
-    updateField('features', [...data.features, newFeature]);
+    updateField('features', [...(data.features ?? []), newFeature]);
   };
 
   const updateFeature = (index: number, updates: Partial<Feature>) => {
-    const features = [...data.features];
+    const features = [...(data.features ?? [])];
     features[index] = { ...features[index], ...updates };
     updateField('features', features);
   };
 
   const removeFeature = (index: number) => {
-    const features = data.features.filter((_, i) => i !== index);
+    const features = (data.features ?? []).filter((_, i) => i !== index);
     updateField('features', features);
   };
 
@@ -101,7 +107,7 @@ export const FeaturesBlockEditor: React.FC<FeaturesBlockEditorProps> = ({
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-slate-700">
-            Features ({data.features.length})
+            Features ({(data.features ?? []).length})
           </label>
           <button
             type="button"

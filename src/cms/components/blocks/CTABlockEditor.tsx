@@ -24,11 +24,17 @@ export const CTABlockEditor: React.FC<CTABlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<CTABlock>(block);
+  const [data, setData] = useState<CTABlock>({
+    ...block,
+    buttons: block.buttons ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      buttons: block.buttons ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -49,17 +55,17 @@ export const CTABlockEditor: React.FC<CTABlockEditorProps> = ({
       url: '#',
       variant: 'primary',
     };
-    updateField('buttons', [...data.buttons, newCTA]);
+    updateField('buttons', [...(data.buttons ?? []), newCTA]);
   };
 
   const updateButton = (index: number, cta: CTA) => {
-    const buttons = [...data.buttons];
+    const buttons = [...(data.buttons ?? [])];
     buttons[index] = cta;
     updateField('buttons', buttons);
   };
 
   const removeButton = (index: number) => {
-    const buttons = data.buttons.filter((_, i) => i !== index);
+    const buttons = (data.buttons ?? []).filter((_, i) => i !== index);
     updateField('buttons', buttons);
   };
 
@@ -100,7 +106,7 @@ export const CTABlockEditor: React.FC<CTABlockEditorProps> = ({
       <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-slate-700">
-            Buttons ({data.buttons.length})
+            Buttons ({(data.buttons ?? []).length})
           </label>
           <button
             type="button"

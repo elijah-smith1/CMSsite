@@ -23,11 +23,17 @@ export const GalleryBlockEditor: React.FC<GalleryBlockEditorProps> = ({
   onSave,
   isSaving,
 }) => {
-  const [data, setData] = useState<GalleryBlock>(block);
+  const [data, setData] = useState<GalleryBlock>({
+    ...block,
+    images: block.images ?? [],
+  });
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    setData(block);
+    setData({
+      ...block,
+      images: block.images ?? [],
+    });
     setHasChanges(false);
   }, [block]);
 
@@ -47,17 +53,17 @@ export const GalleryBlockEditor: React.FC<GalleryBlockEditorProps> = ({
       src: '',
       alt: '',
     };
-    updateField('images', [...data.images, newImage]);
+    updateField('images', [...(data.images ?? []), newImage]);
   };
 
   const updateImage = (index: number, updates: Partial<MediaImage>) => {
-    const images = [...data.images];
+    const images = [...(data.images ?? [])];
     images[index] = { ...images[index], ...updates };
     updateField('images', images);
   };
 
   const removeImage = (index: number) => {
-    const images = data.images.filter((_, i) => i !== index);
+    const images = (data.images ?? []).filter((_, i) => i !== index);
     updateField('images', images);
   };
 
