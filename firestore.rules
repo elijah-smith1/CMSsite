@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Tenants collection
+    match /tenants/{tenantId} {
+      // Allow authenticated users to read tenants
+      // TODO: Implement proper authorization to check if user has access to this tenant
+      allow read: if isAuthenticated();
+      
+      // Allow authenticated users to write (update your logic here)
+      // TODO: Check if user is admin or has write access to this tenant
+      allow write: if isAuthenticated();
+      
+      // Content subcollection
+      match /content/{sectionId} {
+        // Allow authenticated users to read/write content
+        // TODO: Implement tenant-specific authorization
+        allow read, write: if isAuthenticated();
+      }
+    }
+    
+    // Users collection (optional - implement if you store user data)
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+  }
+}
+
